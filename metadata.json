@@ -1,0 +1,8 @@
+{
+  "name": "Copy of 房源随手记 (Property Easy Recorder)",
+  "description": "Smart property listing assistant. Record details via text, voice, or image, and let AI structure the data for you.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}
