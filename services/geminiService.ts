@@ -1,11 +1,11 @@
-import { GoogleGenAI, Type, Schema } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { PropertyData } from "../types";
 
 const GEMINI_API_KEY = process.env.API_KEY || '';
 
 // Define the response schema for strict JSON output
 // We now expect a root object containing an array of listings
-const propertySchema: Schema = {
+const propertySchema = {
   type: Type.OBJECT,
   properties: {
     listings: {
@@ -108,6 +108,49 @@ export const processPropertyInput = async (
 
   } catch (error) {
     console.error("Gemini API Error:", error);
+    throw error;
+  }
+};
+
+/**
+ * Extracts text from audio (transcription) or image (OCR/Description)
+ */
+export const extractTextFromMedia = async (
+  mediaBlob: Blob,
+  mimeType: string
+): Promise<string> => {
+  if (!GEMINI_API_KEY) {
+    throw new Error("API Key is missing");
+  }
+
+  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+  const modelId = "gemini-2.5-flash"; 
+
+  const base64Data = await blobToBase64(mediaBlob);
+
+  const prompt = mimeType.startsWith('audio') 
+    ? "Please transcribe this audio accurately into text. Output ONLY the transcription, no additional commentary."
+    : "Please analyze this image. If it contains text (like a flyer or screenshot), extract all text. If it is a photo of a property, describe the key visual details (e.g., layout, style, condition) that would be useful for a listing description. Output ONLY the extracted text or description.";
+
+  try {
+    const response = await ai.models.generateContent({
+      model: modelId,
+      contents: {
+        parts: [
+          { text: prompt },
+          {
+            inlineData: {
+              mimeType: mimeType,
+              data: base64Data,
+            },
+          },
+        ],
+      },
+    });
+
+    return response.text || "";
+  } catch (error) {
+    console.error("Gemini Media Extraction Error:", error);
     throw error;
   }
 };
