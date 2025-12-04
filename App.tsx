@@ -222,6 +222,7 @@ function App() {
 
   const templates = tasks.filter(h => h.isTemplate);
   const logItems = tasks.filter(h => !h.isTemplate); // All history (processed, failed, published, unpublished)
+  const unpublishedItems = tasks.filter(h => !h.isTemplate && h.status === 'success' && !h.isPublished);
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/20">
@@ -259,6 +260,12 @@ function App() {
                         工作台
                     </button>
                     <button 
+                        onClick={() => setView(AppView.UNPUBLISHED)}
+                        className={`inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${view === AppView.UNPUBLISHED ? 'bg-background text-foreground shadow-sm' : 'hover:bg-background/50 hover:text-foreground'}`}
+                    >
+                        待发布 ({unpublishedItems.length})
+                    </button>
+                    <button 
                         onClick={() => setView(AppView.TEMPLATES)}
                         className={`inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-2 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${view === AppView.TEMPLATES ? 'bg-background text-foreground shadow-sm' : 'hover:bg-background/50 hover:text-foreground'}`}
                     >
@@ -283,16 +290,16 @@ function App() {
             <div className="mx-auto space-y-8">
                 {view === AppView.CREATE && (
                 <div className="flex flex-col gap-8">
-                    {/* Input Section */}
+                    {/* Input Section - Removed max-w-3xl for better width alignment */}
                     <div className="w-full">
                         <InputSection onProcess={handleProcess} isProcessing={false} />
                     </div>
                     
-                    {/* Task Log (Unified in Workbench without specific title) */}
+                    {/* Task Log integrated here */}
                     <div className="w-full">
                          <HistoryList 
                             items={logItems} 
-                            title="" 
+                            title="任务日志" 
                             onSelect={handleSelectTask}
                             onRetry={handleRetry}
                         />
@@ -328,6 +335,15 @@ function App() {
                         </div>
                     </div>
                 </div>
+                )}
+
+                {view === AppView.UNPUBLISHED && (
+                <HistoryList 
+                    items={unpublishedItems} 
+                    title="待发布房源" 
+                    onSelect={handleSelectTask}
+                    onRetry={() => {}} 
+                />
                 )}
 
                 {view === AppView.TEMPLATES && (
