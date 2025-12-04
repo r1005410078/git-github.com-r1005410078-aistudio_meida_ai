@@ -39,9 +39,7 @@ export interface TaskItem {
 
 export enum AppView {
   CREATE = 'CREATE',
-  TASK_LOG = 'TASK_LOG',
   TEMPLATES = 'TEMPLATES',
-  UNPUBLISHED = 'UNPUBLISHED',
 }
 
 export interface AudioState {

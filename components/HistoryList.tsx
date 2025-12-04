@@ -10,19 +10,21 @@ interface TaskLogProps {
 
 const HistoryList: React.FC<TaskLogProps> = ({ items, onSelect, onRetry, title }) => {
   if (items.length === 0) {
+      if (!title) return null; // If no title (main log) and no items, hide completely or show small hint
+      
       return (
           <div className="flex flex-col items-center justify-center py-10 text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted mb-4">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
               </div>
-              <p className="text-sm text-muted-foreground">暂无{title}</p>
+              <p className="text-sm text-muted-foreground">暂无{title || '数据'}</p>
           </div>
       )
   }
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold tracking-tight ml-1">{title}</h3>
+      {title && <h3 className="text-lg font-semibold tracking-tight ml-1">{title}</h3>}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {items.map((item) => (
           <div 
